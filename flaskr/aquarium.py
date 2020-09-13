@@ -9,9 +9,19 @@ pages.append({
 
 bp = Blueprint('aquarium',
                __name__,
-               template_folder='templates',
-               static_url_path='static')
+               template_folder='templates/aquarium',
+               url_prefix='/aquarium',
+               static_folder='templates/aquarium/static')
 
-@bp.route('/aquarium')
+@bp.route('/')
+@bp.route('/overview')
 def aquarium():
-    return render_template('aquarium.html', pages=pages)
+    return render_template('overview.html', pages=pages)
+
+@bp.route('/time_series')
+def time_series():
+    return render_template('time_series.html', pages=pages)    
+
+@bp.route('/config')
+def config():
+    return render_template('config.html', pages=pages)    
