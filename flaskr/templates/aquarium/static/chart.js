@@ -8,17 +8,8 @@ var chartColors = {
     grey: 'rgb(231,233,237)'
 };
 
-// One common x-axis for values
-var labels = ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
-
-// Sensor values data
-var values = {
-    1: {1: [21.42,21.39,21.37,21.32,21.27,21.21,21.15,21.1,21.07,21.07,21.08,21.11,21.13,21.16,21.19,21.23,21.26,21.31,21.33,21.37,21.38,21.38,21.38,21.36],
-        4: [22.22,22.1,21.97,21.9,21.83,21.79,21.79,21.8,21.83,21.85,21.9,21.95,22.03,22.13,22.2,22.3,22.37,22.4,22.53,22.6,22.55,22.51,22.35,22.22,22.03]},
-    2: {2: [15.42,15.42,15.42,15.42,15.43,15.43,15.43,15.44,15.44,15.44,15.43,15.43,15.43,15.43,15.42,15.43,15.43,15.43,15.43,15.43,15.43,15.43,15.43,15.43,15.44]},
-    3: {3: [2.02,2.02,2.02,2.02,2.02,2.02,2.02,2.02,2.02,2.02,2.02,2.02,2.03,2.03,2.03,2.03,2.03,2.03,2.02,2.02,2.02,2.02,2.02,2.02,2.02]},
-    4: {4: [55.29,55.29,55.26,55.2,55.14,55.1,55.09,55.01,55.02,55.08,55.1,55.1,55.13,55.2,55.21,55.38,55.48,55.5,55.64,55.71,55.82,55.96,56.24,56.3,56.42]}
-};
+var labels = {};  // One common x-axis for values
+var values = {};  // Sensor values data
 
 // Measures name dictionary
 var measures = {
@@ -85,7 +76,8 @@ var chartConfig = {
     }
 };
 
-var chart = new Chart(document.getElementById('canvas').getContext('2d'), chartConfig);
+// var chart = new Chart(document.getElementById('canvas').getContext('2d'), chartConfig);
+var chart; //to be initiliesed once data is in place
 var measureForm = document.getElementById('measureSelect');
 var sensorForm = document.getElementById('sensorSelectForm');
 
@@ -105,6 +97,7 @@ function udpateChart(measure, sensorIds)
             label: sensors[sensorId]['name'], //series name
             backgroundColor: clrValue, // series color
             borderColor: clrValue,
+            pointRadius: 0,
             fill: false,
             data: values[measure][sensorId] // values to show
         };
@@ -163,9 +156,22 @@ sensorForm.addEventListener('change', function() {
 
 document.onreadystatechange = function() {
     if (document.readyState != 'complete') {
-        document.getElementById('canvas').style.display = "none";
+        document.getElementById('pageContent').style.display = "none";
         return;
     }
-    document.getElementById('canvas').style.display = "block";
+
+    $.ajaxSetup({async: false});
+    $.get(url='http://127.0.1:5001/api',
+        function(data){
+            values = data["readings"],
+            labels = data["labels"]
+            chartConfig.data.labels = labels;
+        },
+        dataType="json"
+        )
+    
+    chart = new Chart(document.getElementById('canvas').getContext('2d'), chartConfig);
+
+    document.getElementById('pageContent').style.display = "block";
     onMeasureClick(1);
 }
