@@ -12,22 +12,10 @@ var labels = {};  // One common x-axis for values
 var values = {};  // Sensor values data
 
 // Measures name dictionary
-var measures = {
-    1: 'Temperature',
-    2: 'Water level',
-    3: 'Ph',
-    4: 'Humidity'
-};
+var measures = {};
 
 // Sensors dictionary
-var sensors = {
-    1: {'name': 'Water temperature', 'measures': [1]},
-    2: {'name': 'Water level', 'measures': [2]},
-    3: {'name': 'Ph', 'measures': [3]},
-    4: {'name': 'Cover left', 'measures': [1, 4]},
-    5: {'name': 'Cover center', 'measures': [1, 4]},
-    6: {'name': 'Cover right', 'measures': [1, 4]}
-};
+var sensors = {};
 
 var chartDatasets = [{}];
 
@@ -94,7 +82,7 @@ function udpateChart(measure, sensorIds)
 
         // create new chart dataset
         chartDataset = {
-            label: sensors[sensorId]['name'], //series name
+            label: sensors[sensorId]['label'], //series name
             backgroundColor: clrValue, // series color
             borderColor: clrValue,
             pointRadius: 0,
@@ -133,7 +121,7 @@ function fillSensorSelectForm(sensorIds) {
         var option = document.createElement('option');
         
         option.value = sensorId;
-        option.text = sensors[sensorId]['name'];
+        option.text = sensors[sensorId]['label'];
 
         sensorForm.add(option);
     }
@@ -161,10 +149,14 @@ document.onreadystatechange = function() {
     }
 
     $.ajaxSetup({async: false});
-    $.get(url='http://127.0.1:5001/api',
+    $.get(url='http://127.0.1:5001/api/chart_data',
         function(data){
-            values = data["readings"],
-            labels = data["labels"]
+            values = data["readings"];
+            labels = data["labels"];
+
+            measures = data["measures"];
+            sensors = data["sensors"];
+            
             chartConfig.data.labels = labels;
         },
         dataType="json"
