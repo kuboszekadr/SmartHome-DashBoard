@@ -149,7 +149,7 @@ document.onreadystatechange = function() {
     }
 
     $.ajaxSetup({async: false});
-    $.get(url='http://127.0.1:5001/api/chart_data',
+    $.get(url='http://localhost:8080/api/chart_data',
         function(data){
             values = data["readings"];
             labels = data["labels"];
