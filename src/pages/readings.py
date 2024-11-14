@@ -4,14 +4,18 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 import requests
 import json
+import os
 
 from src import app
 
 from dash.dependencies import Input, Output
 from typing import List, Dict
 
+endpoint_url = os.getenv('endpoint_url', '0.0.0.0')
+endpoint_port = os.getenv('endpoint_port', 8010)
+
 def get_data(device_name: str = "SolarMan") -> List[Dict]:
-    url = "http://127.0.0.1:8001/api/v1.0/readings"
+    url = f"http://{endpoint_url}:{endpoint_port}/api/v1.0/readings"
     payload = json.dumps({"device_name": device_name})
     headers = {'Content-Type': 'application/json'}
     response = requests.get(url, headers=headers, data=payload)
