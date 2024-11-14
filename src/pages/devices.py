@@ -13,8 +13,17 @@ from src import app
 endpoint_url = os.getenv('endpoint_url', '0.0.0.0')
 endpoint_port = os.getenv('endpoint_port', 8010)
 
+columns = [
+    {'name': 'Device ID', 'id': 'device_id'},
+    {'name': 'Device IP', 'id': 'device_ip'},
+    {'name': 'Device Name', 'id': 'device_name'},
+    {'name': 'Last Updated', 'id': 'last_update'}
+]
+
 table_layout = dash_table.DataTable(
     id='table',
+    columns=columns,
+    sort_action='native',
     style_as_list_view=True,
     style_header={
         'backgroundColor': 'rgb(30, 30, 30)',

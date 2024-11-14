@@ -1,46 +1,112 @@
 import dash_core_components as dcc
-import dash_html_components as html
+import dash.html as html
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
-from datetime import datetime, timedelta
+import requests
+import json
 
 from src import app
 
-# Mock time series data
-data = [{'Date': (datetime.today() - timedelta(days=i)).strftime('%Y-%m-%d'), 'Value': v} for i, v in enumerate(range(10, 20))]
+from dash.dependencies import Input, Output
+from typing import List, Dict
 
-chart_layout = dcc.Graph(
-                id='time-series-chart',
-                figure={
-                    'data': [
-                        go.Bar(
-                            x=[record['Date'] for record in data],
-                            y=[record['Value'] for record in data],
-                        )
-                    ],
-                    'layout': go.Layout(
-                        title='Time Series Data',
-                        template='plotly_dark'
-                    )
-                }
+def get_data(device_name: str = "SolarMan") -> List[Dict]:
+    url = "http://127.0.0.1:8001/api/v1.0/readings"
+    payload = json.dumps({"device_name": device_name})
+    headers = {'Content-Type': 'application/json'}
+    response = requests.get(url, headers=headers, data=payload)
+    return response.json()
+
+def build_graph(data: List[Dict]) -> go.Figure:
+    results = {
+        'data': [
+            go.Bar(
+                x=[record['reading_timestamp'] for record in data],
+                y=[record['reading_value'] for record in data],
             )
+        ],
+        'layout': go.Layout(
+            title='Time Series Data',
+            template='plotly_dark'
+        )
+    }
+    return results
 
-table_layout = html.Table([
-    html.Thead(
-        html.Tr([html.Th(col) for col in ['Date', 'Value']])
-    ),
-    html.Tbody([
-        html.Tr([
-            html.Td(record[col]) for col in ['Date', 'Value']
-        ]) for record in data
+def build_table(data: List[Dict]) -> html.Table:
+    results = html.Table([
+        html.Thead(
+            html.Tr([html.Th(col) for col in ['Timestamp', 'Value']])
+        ),
+        html.Tbody([
+            html.Tr([
+                html.Td(record[col]) for col in ['reading_timestamp', 'reading_value']
+            ]) for record in data
+        ])
     ])
+    return results
+
+@app.callback(
+    [Output('chart', 'figure'),
+     Output('data-table', 'children')],
+    [Input('device-dropdown', 'value')]
+)
+def update_data(device_name: str):
+    data = get_data(device_name)
+    graph = build_graph(data)
+    table = build_table(data)
+    
+    return graph, table
+
+dropdown_layout = dbc.Row([
+    dbc.Col(html.Fieldset([
+        dbc.Label("Select Device"),
+        dcc.Dropdown(
+            id='device-dropdown',
+            options=[
+                {'label': 'SolarMan', 'value': 'SolarMan'},
+                {'label': 'WaterTemperature', 'value': 'Aquarium-Temperature'},
+                {'label': 'WaterManager', 'value': 'Aquarium-WaterManager-Develop'}
+            ],
+            value='SolarMan',
+            className='custom-select'
+        )
+    ]), width=12)
 ])
 
-# Devices page layout
 layout = dbc.Container([
     dbc.Row([
-        dbc.Col(html.Div(), width=2),
-        dbc.Col([chart_layout, table_layout], width=8),
-        dbc.Col(html.Div(),width=2)
+        dbc.Col(width=2),
+        dbc.Col([
+            dropdown_layout,
+            dcc.Graph(id='chart'),
+            html.Div(id='data-table')
+        ], width=8),
+        dbc.Col(width=2)
+    ])
+], fluid=True)
+
+
+
+layout = dbc.Container([
+    dbc.Row([
+        dbc.Col(width=2),
+        dbc.Col([
+            dropdown_layout,
+            dcc.Graph(id='chart'),
+            html.Div(id='data-table')
+        ], width=8),
+        dbc.Col(width=2)
+    ])
+], fluid=True)
+
+layout = dbc.Container([
+    dbc.Row([
+        dbc.Col(width=2),
+        dbc.Col([
+            dropdown_layout,
+            dcc.Graph(id='chart'),
+            html.Div(id='data-table')
+        ], width=8),
+        dbc.Col(width=2)
     ])
 ], fluid=True)
