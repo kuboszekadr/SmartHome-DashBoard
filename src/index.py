@@ -4,7 +4,11 @@ import dash_bootstrap_components as dbc
 
 from dash.dependencies import Input, Output
 from src import app
-from src.pages import devices, readings
+from src.pages import (
+    devices, 
+    readings,
+    tauron
+)
 from src.pages.navbar import navbar
 
 app.layout = html.Div([
@@ -20,5 +24,7 @@ def display_page(pathname):
         return devices.layout
     elif pathname == '/readings':
         return readings.layout
+    elif pathname == '/tauron':
+        return tauron.layout
     else:
         return '404'

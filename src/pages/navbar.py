@@ -6,6 +6,7 @@ navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Devices", href="/devices")),
         dbc.NavItem(dbc.NavLink("Readings", href="/readings")),
+        dbc.NavItem(dbc.NavLink("Tauron", href="/tauron")),
     ],
     brand="SmartHome",
     brand_href="#",

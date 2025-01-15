@@ -8,6 +8,7 @@ import requests
 from dash import dash_table
 from dash.dependencies import Input, Output
 
+from datetime import datetime
 from src import app 
 
 endpoint_url = os.getenv('endpoint_url', '0.0.0.0')
@@ -57,4 +58,17 @@ layout = dbc.Container([
 )
 def update_table(n):
     data = requests.get(f'http://{endpoint_url}:{endpoint_port}/api/v1.0/devices').json()
+
+    for row in data:
+        row['device_ip'] = html.A(
+            href=f"http://{row['device_ip']}", 
+            children=row['device_ip'], 
+            target="_blank"
+        )
+        # row['last_update'] = (
+        #     datetime
+        #     .strptime(row['last_update'], '%Y-%m-%d %H:%M:%S')
+        #     .strftime('%Y-%m-%d %H:%M:%S')
+        # )
+
     return data

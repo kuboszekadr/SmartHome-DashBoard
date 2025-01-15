@@ -50,7 +50,7 @@ def build_table(data: List[Dict]) -> html.Table:
     return results
 
 @app.callback(
-    [Output('chart', 'figure'),
+    [Output('readings_chart', 'figure'),
      Output('data-table', 'children')],
     [Input('device-dropdown', 'value')]
 )
@@ -82,33 +82,7 @@ layout = dbc.Container([
         dbc.Col(width=2),
         dbc.Col([
             dropdown_layout,
-            dcc.Graph(id='chart'),
-            html.Div(id='data-table')
-        ], width=8),
-        dbc.Col(width=2)
-    ])
-], fluid=True)
-
-
-
-layout = dbc.Container([
-    dbc.Row([
-        dbc.Col(width=2),
-        dbc.Col([
-            dropdown_layout,
-            dcc.Graph(id='chart'),
-            html.Div(id='data-table')
-        ], width=8),
-        dbc.Col(width=2)
-    ])
-], fluid=True)
-
-layout = dbc.Container([
-    dbc.Row([
-        dbc.Col(width=2),
-        dbc.Col([
-            dropdown_layout,
-            dcc.Graph(id='chart'),
+            dcc.Graph(id='readings_chart'),
             html.Div(id='data-table')
         ], width=8),
         dbc.Col(width=2)
